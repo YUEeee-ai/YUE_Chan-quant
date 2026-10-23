@@ -1,0 +1,43 @@
+# Python 字节码 / 缓存
+*.py[co]
+__pycache__/
+
+# 打包 / 虚拟环境
+*.egg-info/
+build/
+dist/
+.venv/
+venv/
+env/
+
+# Jupyter
+*-checkpoint.ipynb
+
+# 测试 / 覆盖率缓存
+.pytest_cache/
+.mypy_cache/
+
+# 编辑器 / IDE
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# 操作系统临时文件
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# 日志 / 本地数据库
+*.log
+*.db
+
+# 回测/分析生成的中间产物 (可用 --plot 或 Script/ 重新生成, 不入库)
+results/
+*.png
+
+# 本地私密配置 (上游遗留的推送/对象存储配置)
+config.yaml
+OpenConfig.yaml
+gotify_push.py
+cos_config.yaml

@@ -1,0 +1,8 @@
+baostock>=0.8.8
+ipython>=8.5.0
+matplotlib>=3.5.3
+numpy>=1.23.3
+pandas>=1.4.2
+requests>=2.22.0
+yfinance>=0.2.31
+alpaca-py>=0.13.0
