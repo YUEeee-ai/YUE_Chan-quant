@@ -10,6 +10,20 @@ YUE_Chan turns Chan theory from a chart-marking hobby into a backtestable, live-
 
 ---
 
+## Preview
+
+AAPL · 2015–2024 · multi-level backtest (month > week > day).
+
+**Chan structure & executed trades**
+
+![Chan structure and executed trades](./assets/aapl_structure_trades.png)
+
+**Equity curve & drawdown**
+
+![Equity curve and drawdown](./assets/aapl_equity.png)
+
+---
+
 ## Contents
 
 - [Why this project](#why-this-project)

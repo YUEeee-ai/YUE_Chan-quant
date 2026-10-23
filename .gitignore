@@ -35,6 +35,8 @@ desktop.ini
 # 回测/分析生成的中间产物 (可用 --plot 或 Script/ 重新生成, 不入库)
 results/
 *.png
+# 例外: README 门面截图入库
+!assets/*.png
 
 # 本地私密配置 (上游遗留的推送/对象存储配置)
 config.yaml
