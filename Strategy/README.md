@@ -214,6 +214,7 @@ initial_capital / market / commission_rate / use_nested / autype`。市场能力
 `allow_fractional` 或 `lot_size<=1` 时不取整（美股碎股），否则按 `lot_size` 向下取整（A/港股 100 股一手）。
 
 **指标 `_calc_metrics`**：总收益、年化（取权益曲线首末快照的真实日历跨度算年数 `years`，再 `(1+r)^(1/years)-1`）、最大回撤（cummax）、夏普（`mean/std × √(每年采样点数)`，采样点数由同一跨度推出，单级别日频时即 `√252`）、胜率、盈亏比（均盈/均亏），并分 `BUY/SELL/SHORT/COVER` 计数。
+另算**同期买入持有基准** `buy_hold_return` / `bh_curve`（用与策略同一份日线的 `initial_capital × 当前价/首价`）：`print_report` 打印"同期买入持有"与"超额收益 α = 策略 − 持有"并标注是否跑赢，`_plot_equity` 在资金曲线上叠一条灰色虚线 `buy & hold`，让"择时是否真的强过拿着不动"一眼可见。
 `print_report` 打印市场能力（做空/T+0/lot）、级别、资金、指标、交易明细；有 `lot_skip_count` 时提示调高 `--capital`。
 
 **绘图 `plot`**：配 CJK 字体（`_setup_cjk_font` 在候选字体列表里选第一个可用），`_build_trade_markers`

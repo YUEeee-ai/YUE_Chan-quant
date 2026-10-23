@@ -162,6 +162,7 @@ def _chan_config_dict(args, triger_step: bool) -> dict:
         "triger_step": triger_step,
         "divergence_rate": args.div_rate,
         "min_zs_cnt": 1,
+        "max_kl_misalgin_cnt": args.max_misalign,
         **DEFAULT_ALGO_CONFIG,
     }
 
@@ -230,6 +231,7 @@ def run_backtest(args):
         end_time=args.end,
         data_src=data_src,
         lv_list=lv_list_full,
+        chan_config={"max_kl_misalgin_cnt": args.max_misalign},
         strategy_config=strategy_config,
         initial_capital=args.capital,
         market=market,
@@ -503,6 +505,8 @@ def main():
     parser.add_argument("--end", type=str, default=None)
     parser.add_argument("--capital", type=float, default=100000)
     parser.add_argument("--div-rate", type=float, default=0.9)
+    parser.add_argument("--max-misalign", type=int, default=2,
+                        help="多级别对齐容差: 允许'次级别找不到K线'的最大次数(默认2; 港股/A股月周日历错位多时可调大, 如 200)")
     parser.add_argument("--nested", action="store_true", help="启用区间套(操作级别下挂次级别精确定位)")
     parser.add_argument("--loose", action="store_true", help="宽松模式(允许盘整背驰产生一类)")
     parser.add_argument("--no-short", action="store_true", help="禁用做空(A股默认禁用)")

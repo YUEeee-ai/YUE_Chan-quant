@@ -39,6 +39,8 @@ class BacktestResult:
     avg_holding_days: float = 0.0      # 平均持仓天数
     trade_history: List[TradeRecord] = field(default_factory=list)
     equity_curve: List[float] = field(default_factory=list)
+    buy_hold_return: float = 0.0         # 同期买入持有基准收益率
+    bh_curve: List[float] = field(default_factory=list)  # 买入持有资金曲线(与equity_curve对齐, 供绘图)
     initial_capital: float = 100000.0
     final_capital: float = 100000.0
     market: str = ""                   # 市场标识
@@ -148,6 +150,8 @@ class Backtester:
         snapshot = None
         curve_first_ts = None   # 权益曲线首/末快照时间戳，用于按真实日历跨度年化
         curve_last_ts = None
+        bh_first_price = None   # 买入持有基准: 首个有效收盘价
+        bh_curve = []           # 与 equity_curve 对齐的买入持有资金曲线
 
         for snapshot in chan.step_load():
             try:
@@ -192,6 +196,10 @@ class Backtester:
 
             equity = capital + long_shares * current_price - short_shares * current_price
             equity_curve.append(equity)
+            if bh_first_price is None and current_price > 0:
+                bh_first_price = current_price
+            if bh_first_price:
+                bh_curve.append(self.initial_capital * current_price / bh_first_price)
             _ts = getattr(current_date, "ts", None)
             if _ts is not None:
                 if curve_first_ts is None:
@@ -224,10 +232,14 @@ class Backtester:
 
         curve_span_sec = (curve_last_ts - curve_first_ts) if (curve_first_ts is not None and curve_last_ts is not None) else None
 
-        return self._calc_metrics(
+        result = self._calc_metrics(
             equity_curve, final_capital, strategy.trade_history,
             trade_pairs, total_cost, curve_span_sec,
         )
+        result.bh_curve = bh_curve
+        if bh_curve and bh_first_price:
+            result.buy_hold_return = bh_curve[-1] / self.initial_capital - 1
+        return result
 
     def _can_close(self, record: TradeRecord, current_date, long_entry_date, short_entry_date) -> bool:
         """
@@ -423,6 +435,10 @@ class Backtester:
         print(f"  年化收益率:   {result.annual_return*100:.2f}%")
         print(f"  最大回撤:     {result.max_drawdown*100:.2f}%")
         print(f"  夏普比率:     {result.sharpe_ratio:.2f}")
+        print(f"  同期买入持有: {result.buy_hold_return*100:.2f}%")
+        _alpha = (result.total_return - result.buy_hold_return) * 100
+        print(f"  超额收益(α):  {_alpha:+.2f}pp"
+              + ("   ✓ 跑赢持有" if _alpha >= 0 else "   ✗ 跑输持有"))
         print(f"  总交易成本:   {result.total_cost:,.2f}")
         print("-" * 60)
         print(f"  总交易信号:   {result.total_trades}")
@@ -611,10 +627,14 @@ class Backtester:
             2, 1, figsize=(14, 7), sharex=True, gridspec_kw={"height_ratios": [3, 1]}
         )
         ax1.plot(x, arr, color="navy", lw=1.0, label="equity")
-        ax1.axhline(result.initial_capital, color="gray", ls="--", lw=0.8)
+        if result.bh_curve and len(result.bh_curve) == len(arr):
+            ax1.plot(x, np.array(result.bh_curve, dtype=float),
+                     color="gray", lw=1.0, ls="--", label="buy & hold")
+        ax1.axhline(result.initial_capital, color="gray", ls=":", lw=0.8)
+        _alpha = (result.total_return - result.buy_hold_return) * 100
         ax1.set_title(
-            f"{self.code} 资金曲线  初始 {result.initial_capital:,.0f} → "
-            f"最终 {result.final_capital:,.0f}  ({result.total_return*100:+.2f}%)  "
+            f"{self.code} 资金曲线  策略 {result.total_return*100:+.1f}%  vs  "
+            f"买入持有 {result.buy_hold_return*100:+.1f}%  (α {_alpha:+.1f}pp)  "
             f"夏普 {result.sharpe_ratio:.2f}  胜率 {result.win_rate*100:.1f}%"
         )
         ax1.set_ylabel("equity")
