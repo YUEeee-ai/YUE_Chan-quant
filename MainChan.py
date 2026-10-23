@@ -119,10 +119,12 @@ def _build_strategy_config(args, cap, operating_lv, lv_list_full, nested_lv) -> 
         position_l2=0.4,
         position_l3=0.3,
         stop_buffer=0.02,
+        stop_loss_long=args.long_stop,
         require_fx_confirm=not args.no_fx_confirm,
         enable_short=enable_short,
         only_trend_bsp1=not args.loose,
         cooldown_bars=5,
+        hold_trend_until_perfect=not args.no_hold_trend,
         # ① 多级别联立 + 跨级别背驰归属
         use_level_linkage=not args.no_level_linkage,
         # ② 同级别分解
@@ -511,6 +513,8 @@ def main():
     parser.add_argument("--loose", action="store_true", help="宽松模式(允许盘整背驰产生一类)")
     parser.add_argument("--no-short", action="store_true", help="禁用做空(A股默认禁用)")
     parser.add_argument("--no-fx-confirm", action="store_true", help="关闭分型确认(BSP即刻入场)")
+    parser.add_argument("--long-stop", action="store_true", help="多头也启用机械止损(默认关闭, 只靠卖点离场)")
+    parser.add_argument("--no-hold-trend", action="store_true", help="关闭'走势未完美就持有'门控, 卖点正常触发即离场(防扛单)")
     # 前四层纪律开关(⑤~⑩见下方新增六层开关)
     parser.add_argument("--no-level-linkage", action="store_true", help="关闭①多级别联立/背驰归属")
     parser.add_argument("--no-decompose", action="store_true", help="关闭②同级别分解")
