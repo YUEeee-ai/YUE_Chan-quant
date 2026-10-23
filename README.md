@@ -2,11 +2,13 @@
 
 [**English**](./README.md) | [中文](./README_zh.md)
 
-**A multi-market quantitative-trading system built on Chan theory (缠论 / "the mathematical principles of market philosophy").**
+**A research & engineering implementation of Chan theory (缠论 / "the mathematical principles of market philosophy") — a complete signal engine plus an honest, multi-market backtest harness.**
 
-YUE_Chan turns Chan theory from a chart-marking hobby into a backtestable, live-tradable system. It implements a full pipeline — fractal → stroke → segment → center → divergence → three buy/sell points — with multi-timeframe analysis, a set of ten independently toggleable "level/trend discipline" gates, a long/short strategy engine, backtesting across US / HK / A-share / crypto (each with its own market rules applied automatically), and broker execution bridges. Pure Python, no commercial market-data terminal required.
+YUE_Chan is a study of how far Chan theory can be made fully algorithmic. It implements the entire pipeline — fractal → stroke → segment → center → divergence → three buy/sell points — with multi-timeframe analysis, ten independently toggleable "level/trend discipline" gates, a long/short strategy engine, and a backtester across US / HK / A-share / crypto that applies each market's rules and **reports α against a buy-and-hold benchmark**. Pure Python, no commercial market-data terminal required.
 
 > This is a research / educational project. It is **not** investment advice. See [Disclaimer](#disclaimer).
+
+> **Honest positioning (this is a research project, not a track record).** The framework is a "sit-out-when-uncertain" timing system. Its documented finding ([RESEARCH.md](./RESEARCH.md) §17): in a sustained bull market it **underperforms buy-and-hold** (e.g. AAPL 2015–2024: strategy +276% vs hold +690%), and its value is **drawdown control / bear-market protection**, not alpha. The backtest is built to *measure* this honestly — no look-ahead, α-vs-hold reported on every run — not to showcase a flattering number.
 
 ---
 
@@ -16,7 +18,7 @@ YUE_Chan turns Chan theory from a chart-marking hobby into a backtestable, live-
 
 ![Chan structure](./assets/aapl_structure.png)
 
-**Backtest equity curve** — AAPL 2015–2024, multi-level (month > week > day): +292.69% total, Sharpe 0.68, 75% win rate; drawdown below.
+**Backtest vs buy-and-hold** — AAPL 2015–2024, multi-level (month > week > day): strategy **+276%** vs buy-and-hold **+690%** (α −414pp; the gray dashed line is hold). Shown honestly — a risk-off timing system gives up return in a strong bull; its edge is the shallower drawdown.
 
 ![Equity curve and drawdown](./assets/aapl_equity.png)
 
@@ -57,7 +59,7 @@ YUE_Chan goes further:
 
 - **Faithful, algorithmic Chan theory.** Every algorithmically-expressible lesson of the 108-lesson original text is implemented; the [implementation status matrix](./IMPLEMENTATION_STATUS.md) maps each lesson to its code (Chinese).
 - **Ten discipline gates, each independently switchable** — so every layer's contribution can be measured by ablation, not asserted.
-- **Empirical, honest reporting.** Divergence criteria, why shorting fails on some markets, flip-vs-flat, stop-loss and level-gating behaviour are all backed by ablation experiments in [RESEARCH.md](./RESEARCH.md) (Chinese); result artifacts live in [`results/`](./results).
+- **Empirical, honest reporting.** Every backtest prints **α vs a buy-and-hold benchmark** and overlays the hold curve, so performance is never judged in a vacuum. Divergence criteria, why shorting fails on some markets, flip-vs-flat, stop-loss and level-gating behaviour are backed by ablation experiments in [RESEARCH.md](./RESEARCH.md) (Chinese); §17 records the honest headline: a risk-off Chan timing system **loses to buy-and-hold in bulls, wins by losing less in bears**. Result artifacts live in [`results/`](./results).
 - **Offline self-check.** `python Script/SmokeOffline.py` runs the whole pipeline on synthetic data (no network) — run it after any change.
 
 ## Architecture
