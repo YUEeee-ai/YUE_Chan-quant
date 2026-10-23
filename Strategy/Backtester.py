@@ -146,6 +146,8 @@ class Backtester:
         trade_pairs = []
         total_cost = 0.0
         snapshot = None
+        curve_first_ts = None   # 权益曲线首/末快照时间戳，用于按真实日历跨度年化
+        curve_last_ts = None
 
         for snapshot in chan.step_load():
             try:
@@ -190,6 +192,11 @@ class Backtester:
 
             equity = capital + long_shares * current_price - short_shares * current_price
             equity_curve.append(equity)
+            _ts = getattr(current_date, "ts", None)
+            if _ts is not None:
+                if curve_first_ts is None:
+                    curve_first_ts = _ts
+                curve_last_ts = _ts
 
         # 强制平仓
         if snapshot is not None:
@@ -215,9 +222,11 @@ class Backtester:
         final_capital = capital
         self.bsp_decisions = list(getattr(strategy, "bsp_decisions", []))
 
+        curve_span_sec = (curve_last_ts - curve_first_ts) if (curve_first_ts is not None and curve_last_ts is not None) else None
+
         return self._calc_metrics(
             equity_curve, final_capital, strategy.trade_history,
-            trade_pairs, total_cost,
+            trade_pairs, total_cost, curve_span_sec,
         )
 
     def _can_close(self, record: TradeRecord, current_date, long_entry_date, short_entry_date) -> bool:
@@ -345,7 +354,7 @@ class Backtester:
         return (capital, long_shares, short_shares, long_entry_price, short_entry_price,
                 long_entry_date, short_entry_date, trade_pairs, cost)
 
-    def _calc_metrics(self, equity_curve, final_capital, trade_history, trade_pairs, total_cost) -> BacktestResult:
+    def _calc_metrics(self, equity_curve, final_capital, trade_history, trade_pairs, total_cost, curve_span_sec=None) -> BacktestResult:
         """计算绩效指标"""
         result = BacktestResult()
         result.initial_capital = self.initial_capital
@@ -362,9 +371,16 @@ class Backtester:
 
         result.total_return = (final_capital - self.initial_capital) / self.initial_capital
 
+        # 真实日历跨度 → 年数；单级别下每个权益点=一个交易日，多级别下点数≠交易日数，
+        # 故一律按首末快照的真实时间跨度年化（拿不到跨度时才退回 len/252 近似）。
+        years = (curve_span_sec / (365.25 * 24 * 3600)) if curve_span_sec and curve_span_sec > 0 else None
+
         if len(equity_curve) > 1:
-            n_days = len(equity_curve)
-            result.annual_return = (1 + result.total_return) ** (252 / max(n_days, 1)) - 1
+            if years and years > 0:
+                result.annual_return = (1 + result.total_return) ** (1 / years) - 1
+            else:
+                n_days = len(equity_curve)
+                result.annual_return = (1 + result.total_return) ** (252 / max(n_days, 1)) - 1
 
         if equity_curve:
             arr = np.array(equity_curve)
@@ -374,8 +390,10 @@ class Backtester:
 
         if len(equity_curve) > 2:
             returns = np.diff(equity_curve) / np.array(equity_curve[:-1])
+            # 年化因子按"每年多少个采样点"取，而非写死 252；单级别(点=交易日)时≈252，与旧值一致
+            periods_per_year = (len(equity_curve) / years) if years and years > 0 else 252
             if np.std(returns) > 0:
-                result.sharpe_ratio = float(np.mean(returns) / np.std(returns) * np.sqrt(252))
+                result.sharpe_ratio = float(np.mean(returns) / np.std(returns) * np.sqrt(periods_per_year))
 
         if trade_pairs:
             wins = [p for p in trade_pairs if p > 0]

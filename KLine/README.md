@@ -85,7 +85,7 @@
 
 ### 4.4 `CKLine_List`（KLineList.py）—— 单级别计算总调度器
 
-**持有结构**（一个级别的全部产物）：`lst`（合并 K 线）、`bi_list`（`CBiList`）、`seg_list`（笔线段）与 `segseg_list`（线段之线段，级别递归）、`zs_list`（笔中枢）与 `segzs_list`（段中枢）、`bs_point_lst` 与 `seg_bs_point_lst`（笔级/段级买卖点）、`metric_model_lst`（指标模型）。`seg_list/segseg_list` 通过 `get_seglist_instance` 按 `seg_algo` 选择 `chan/1+1/break` 三种线段算法（后两者打印"已弃用"）。
+**持有结构**（一个级别的全部产物）：`lst`（合并 K 线）、`bi_list`（`CBiList`）、`seg_list`（笔线段）与 `segseg_list`（线段之线段，级别递归）、`zs_list`（笔中枢）与 `segzs_list`（段中枢）、`bs_point_lst` 与 `seg_bs_point_lst`（笔级/段级买卖点）、`metric_model_lst`（指标模型）。`seg_list/segseg_list` 通过 `get_seglist_instance` 构造线段算法实例（目前仅 `chan` 特征序列算法；`seg_algo` 合法性在 `CSegConfig` 校验）。
 
 **增量流水线 `add_single_klu(klu)`**（对应第 65 课"当下性"，逐根喂入）：
 1. `klu.set_metric(...)` 挂指标；
