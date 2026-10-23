@@ -211,8 +211,7 @@ initial_capital / market / commission_rate / use_nested / autype`。市场能力
 **A 股卖出单边**、**港股买卖/开空/回补双边全收**；过户费仅 A 股 `transfer_fee`。`_round_qty` 在
 `allow_fractional` 或 `lot_size<=1` 时不取整（美股碎股），否则按 `lot_size` 向下取整（A/港股 100 股一手）。
 
-**指标 `_calc_metrics`**：总收益、年化（`(1+r)^(252/n)-1`）、最大回撤（cummax）、夏普
-（`mean/std*√252`）、胜率、盈亏比（均盈/均亏），并分 `BUY/SELL/SHORT/COVER` 计数。
+**指标 `_calc_metrics`**：总收益、年化（取权益曲线首末快照的真实日历跨度算年数 `years`，再 `(1+r)^(1/years)-1`）、最大回撤（cummax）、夏普（`mean/std × √(每年采样点数)`，采样点数由同一跨度推出，单级别日频时即 `√252`）、胜率、盈亏比（均盈/均亏），并分 `BUY/SELL/SHORT/COVER` 计数。
 `print_report` 打印市场能力（做空/T+0/lot）、级别、资金、指标、交易明细；有 `lot_skip_count` 时提示调高 `--capital`。
 
 **绘图 `plot`**：配 CJK 字体（`_setup_cjk_font` 在候选字体列表里选第一个可用），`_build_trade_markers`

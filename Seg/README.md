@@ -172,7 +172,7 @@
 
 | 参数 | 默认 | 作用 |
 |------|------|------|
-| `seg_algo` | `"chan"` | 目前仅 `chan`=`CSegListChan`（原文特征序列算法）。由 `KLine.KLineList.get_seglist_instance` 路由 |
+| `seg_algo` | `"chan"` | `chan`=`CSegListChan`（原文特征序列算法）；取值在 `CSegConfig` 校验，由 `KLine.KLineList.get_seglist_instance` 路由 |
 | `left_method` | `"peak"` | `peak`=`LEFT_SEG_METHOD.PEAK`（剩余笔找极值分段）；`all`=`ALL`（尾部一笔到底，注释警告"容易找不到二类买卖点"）。在 `SegListComm.collect_first_seg/collect_segs` 使用 |
 
 > **两个不同的"缺口"**：`gap_as_kl` 不是 `Seg` 的配置项，它定义在 `Bi.BiConfig`，作用是把笔跨度里的价格缺口当作一根额外 K 线来算 `get_klc_span`（详见 `Bi/README.md`）。`Seg` 层处理的是特征序列缺口（`CEigen.gap` + `EigenFX.can_be_end/find_revert_fx` 的第一/第二种情况），源自第 71/77/78 课，与 `gap_as_kl` 属于不同层次的"缺口"概念。`Seg` 自身的开关只有上表两项。
