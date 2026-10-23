@@ -115,6 +115,7 @@ class StrategyConfig:
     stop_loss_long: bool = False    # 多头: 默认不设机械止损, 只靠卖点离场(缠论"卖点卖"+让利润奔跑)
     stop_loss_short: bool = True    # 空头: 默认保留保护性止损(空头亏损无限, 单边行情里防穿仓)
     stop_buffer: float = 0.02       # 止损缓冲 2% (止损位 = 笔低/笔高 × (1∓buffer))
+    long_trail: float = 0.0         # 多头移动止损: 从持仓期最高价回撤该比例即离场(0=关闭); 治"下跌无卖点扛单"
 
     # 操作纪律
     require_fx_confirm: bool = True # 等分型确认再入场 (书中强调不预测)
@@ -225,6 +226,7 @@ class ChanStrategy:
         self._cooldown_until = -1
         self._bar_count = 0
         self._pending_signal = None
+        self._long_peak = 0.0       # 多头持仓期最高价(移动止损用)
 
         # === 走势分析器 (①~④: 级别联立/同级别分解/中阴/均线) ===
         lv_list = config.lv_list or [config.operating_lv]
@@ -482,6 +484,21 @@ class ChanStrategy:
         【非对称依据】多头最大亏损 100%、且卖点终会出现 → 不必机械止损;
         空头亏损理论无限、单边行情里"顶背驰卖点"迟迟不来 → 必须保留结构止损防穿仓。
         """
+        # 多头移动止损 (long_trail>0 启用): 更新持仓期峰值, 从峰值回撤 long_trail 即离场
+        # (会更新 _long_peak 这一内部峰值状态)
+        if self.config.long_trail > 0 and self.long_ratio > 0.001:
+            if current_price > self._long_peak:
+                self._long_peak = current_price
+            trail_stop = self._long_peak * (1 - self.config.long_trail)
+            if current_price <= trail_stop:
+                return TradeRecord(
+                    time="TRAIL_STOP", action="SELL", price=current_price,
+                    bsp_type="TRAIL", bsp_level="",
+                    position_ratio=-self.long_ratio,
+                    reason=f"多头移动止损 (峰值{self._long_peak:.2f} 回撤{self.config.long_trail*100:.0f}%→{trail_stop:.2f})",
+                    direction="LONG",
+                )
+
         # 多头止损 (默认关闭: 卖点离场)
         if self.config.stop_loss_long and self.long_ratio > 0.001 and self.long_stop > 0:
             if current_price <= self.long_stop:
@@ -973,6 +990,7 @@ class ChanStrategy:
         self.long_ratio = min(1.0, self.long_ratio + ratio)
         self.long_entry = price
         self.long_stop = stop
+        self._long_peak = max(self._long_peak, price)
         self.trade_history.append(record)
         return record
 
@@ -1108,6 +1126,7 @@ class ChanStrategy:
             self.long_ratio = min(1.0, self.long_ratio + ratio)
             self.long_entry = price
             self.long_stop = stop
+            self._long_peak = max(self._long_peak, price)
         elif action == "SHORT":
             # 分型确认时重新校验做空门控: 若这1-3根内趋势转涨, 放弃做空
             if not self._can_short(chan):
@@ -1208,6 +1227,7 @@ class ChanStrategy:
         self.long_ratio = 0.0
         self.long_entry = 0.0
         self.long_stop = 0.0
+        self._long_peak = 0.0
         self._rebound_pos = None
 
     def _close_short(self):
