@@ -8,8 +8,6 @@ YUE_Chan is a study of how far Chan theory can be made fully algorithmic. It imp
 
 > This is a research / educational project. It is **not** investment advice. See [Disclaimer](#disclaimer).
 
-> **Honest positioning (this is a research project, not a track record).** The framework is a "sit-out-when-uncertain" timing system. Its documented finding ([RESEARCH.md](./RESEARCH.md) §17): in a sustained bull market it **underperforms buy-and-hold** (e.g. AAPL 2015–2024: strategy +276% vs hold +690%), and its value is **drawdown control / bear-market protection**, not alpha. The backtest is built to *measure* this honestly — no look-ahead, α-vs-hold reported on every run — not to showcase a flattering number.
-
 ---
 
 ## Preview
@@ -307,7 +305,7 @@ Chan theory has no settled English vocabulary, so key terms keep their pinyin:
 
 ## Disclaimer
 
-This project is for learning and research only and is **not** investment advice. Backtest returns are based on historical data and simplified market models (no slippage/impact, liquidity constraints, or full corporate-action handling); **past performance does not guarantee future results**. Chan buy/sell-point identification involves subjective criteria and is parameter-sensitive; you trade at your own risk.
+This project is for learning and research only and is **not** investment advice. It is a "sit-out-when-uncertain" timing framework: in a sustained bull market it **underperforms buy-and-hold** (documented in [RESEARCH.md](./RESEARCH.md) §17), and its value lies in drawdown control rather than alpha. Backtest returns are based on historical data and simplified market models (no slippage/impact, liquidity constraints, or full corporate-action handling); **past performance does not guarantee future results**. Chan buy/sell-point identification involves subjective criteria and is parameter-sensitive; you trade at your own risk.
 
 ## License
 
