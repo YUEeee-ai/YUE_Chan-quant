@@ -36,6 +36,16 @@ Color legend:
 - **Gray dashed line** — buy-and-hold benchmark
 - **Red area (lower panel)** — strategy drawdown
 
+**Executed trades & veto reasons** — operating level (daily). Shows where the strategy actually acted, and where each discipline layer blocked a signal (annotated in Chinese).
+
+![Trades and veto annotations](./assets/trades_annotated.png)
+
+Marker legend:
+- **`b1 / b2 / b2s / b3a` (red)** — buy points (1st / 2nd / pseudo-2nd / 3a type)
+- **`s1p / s2 / s2s / s3a` (green)** — sell points (1st-pseudo / 2nd / pseudo-2nd / 3a type)
+- **`平多` / `平空` / `买RB(107课)`** — executed actions (close long / close short / 107-lesson rebound buy)
+- **`×满仓` / `×持币·中阴` / `×均线` / `×冷却` / `×级别`** — signals vetoed by a discipline layer (already full / middle-Yin cash / MA alignment / cooldown / level-attribution)
+
 ---
 
 ## Contents
