@@ -640,6 +640,8 @@ class CPlotDriver:
             arrow_w=1,
             fontsize=14,
             default_color='b',
+            stagger_gap=8.0,
+            stagger_step=1.0,
     ):
         # {'2022/03/01': ('xxx', 'up', 'red'), '2022/03/02': ('yyy', 'down')}
         x_begin, x_end = ax.get_xlim()
@@ -648,9 +650,15 @@ class CPlotDriver:
         y_range = self.y_max-self.y_min
         arror_len = arrow_l*y_range
         arrow_h = arror_len*arrow_h_r
-        for date, marker in markers.items():
+        # 分道错层：每个方向(上/下)各维护一组车道，记录该车道最近占用的 x，
+        # 同一车道内两个标记水平太近就往上换一层(引线加长)，避免文字重叠。
+        lane_last_x = {'up': [], 'down': []}
+        for date, marker in sorted(markers.items(),
+                                   key=lambda kv: datetick_dict.get(kv[0].to_str() if isinstance(kv[0], CTime) else kv[0], -1)):
             if isinstance(date, CTime):
                 date = date.to_str()
+            if date not in datetick_dict:
+                continue
             x = datetick_dict[date]
             if x < x_begin or x > x_end:
                 continue
@@ -663,18 +671,28 @@ class CPlotDriver:
             assert position in ['up', 'down']
             _dir = -1 if position == 'up' else 1
             bench = kl_dict[x].high if position == 'up' else kl_dict[x].low
+            lanes = lane_last_x[position]
+            level = 0
+            while level < len(lanes) and x - lanes[level] < stagger_gap:
+                level += 1
+            if level == len(lanes):
+                lanes.append(x)
+            else:
+                lanes[level] = x
+            line_len = arror_len * (1 + level*stagger_step)   # 层数越高，引线越长，标签越错开
+            tip_y = bench - line_len*_dir
             ax.arrow(
                 x,
-                bench-arror_len*_dir,
+                tip_y,
                 0,
-                (arror_len-arrow_h)*_dir,  # 箭头的长度实际上是arror_len+arrow_h，所以要减去，顺便减去半个箭头防止和K线重叠
+                (line_len-arrow_h)*_dir,  # 箭头的长度实际上是line_len+arrow_h，所以要减去，顺便减去半个箭头防止和K线重叠
                 head_width=arrow_w,
                 head_length=arrow_h,
                 color=color
             )
             ax.text(
                 x,
-                bench-arror_len*_dir,
+                tip_y,
                 marker_content,
                 fontsize=fontsize,
                 color=color,
