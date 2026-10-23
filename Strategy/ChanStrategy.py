@@ -942,6 +942,11 @@ class ChanStrategy:
 
     # === 执行层: 开多/开空/平多/平空/反手 ===
 
+    def _fill_close(self, chan: CChan) -> float:
+        """确认 bar 的收盘价：所有成交统一按信号被确认的当根收盘价，
+        不再取买卖点那根历史极值价 (bsp.klu.close)，以消除未来函数。"""
+        return chan[self.config.operating_lv][-1][-1].close
+
     def _open_long(self, chan, bsp, label, reason, ratio) -> Optional[TradeRecord]:
         """开多/加多 (受做多门控 + 中阴降权 + 门控放行缩放⑤⑥ + 赋格齐奏加权⑨)"""
         if not self._can_open_long(chan):
@@ -958,7 +963,7 @@ class ChanStrategy:
                 "detected_bar": self._bar_count, "is_buy": True,
             }
             return None
-        price = bsp.klu.close
+        price = self._fill_close(chan)
         stop = self._calc_long_stop(bsp)
         record = TradeRecord(
             time=str(bsp.klu.time), action="BUY", price=price,
@@ -987,7 +992,7 @@ class ChanStrategy:
                 "detected_bar": self._bar_count, "is_buy": False,
             }
             return None
-        price = bsp.klu.close
+        price = self._fill_close(chan)
         stop = self._calc_short_stop(bsp)
         record = TradeRecord(
             time=str(bsp.klu.time), action="SHORT", price=price,
@@ -1002,7 +1007,7 @@ class ChanStrategy:
 
     def _close_long_signal(self, chan, bsp, label, reason) -> TradeRecord:
         """平多"""
-        price = bsp.klu.close
+        price = self._fill_close(chan)
         record = TradeRecord(
             time=str(bsp.klu.time), action="SELL", price=price,
             bsp_type=label, bsp_level=str(self.config.operating_lv),
@@ -1014,7 +1019,7 @@ class ChanStrategy:
 
     def _close_short_signal(self, chan, bsp, label, reason) -> TradeRecord:
         """平空"""
-        price = bsp.klu.close
+        price = self._fill_close(chan)
         record = TradeRecord(
             time=str(bsp.klu.time), action="COVER", price=price,
             bsp_type=label, bsp_level=str(self.config.operating_lv),
@@ -1029,7 +1034,7 @@ class ChanStrategy:
         反手: 一个信号内完成 平旧仓+开新仓
         书中"走势终完美" — 一个走势完成就是另一个走势开始
         """
-        price = bsp.klu.close
+        price = self._fill_close(chan)
         if to_long:
             # 平空 → 开多
             close_record = TradeRecord(
@@ -1159,7 +1164,7 @@ class ChanStrategy:
         ratio = max(0.0, min(1.0, self.config.rebound_scale))
         if ratio <= 0.001:
             return None
-        price = bsp.klu.close
+        price = self._fill_close(chan)
         reason = (f"短线反弹买点(急跌{plan.drop_pct:.1f}%/{plan.drop_bars}K后), "
                   f"目标{plan.target_price:.2f} 止损{plan.stop_price:.2f}")
         record = TradeRecord(
@@ -1327,7 +1332,7 @@ class ChanNestedStrategy:
                 continue  # 该级别无子背驰, 保持上一层结果继续试更低级别
 
             sub_win = self._bsp_window(matched)
-            precise_price = matched.klu.close
+            precise_price = sub_kl[-1][-1].close  # 用当前次级别收盘价，不用历史极值价(未来函数)
             precise_time = str(matched.klu.time)
             level_path.append(f"{sub_lv.name}@{precise_time[:10]}")
             if sub_win is not None:

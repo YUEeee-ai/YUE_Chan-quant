@@ -134,6 +134,8 @@
 _close_short_signal`（平多/平空）、`_execute_flip`（反手：一个信号内先平旧再开新，默认关闭）。
 若 `require_fx_confirm=True`，开仓不立即成交，而是写入 `_pending_signal`，等最近 1–3 根合并 K 线
 出现对应 `FX_TYPE.BOTTOM/TOP` 分型才在 `_try_confirm_pending` 中以最新价入场（落实"不预测、等确认"）。
+所有成交（开/平/反手/反弹/区间套）的价格统一由 `_fill_close(chan)` 给出，即"信号被确认那根 bar 的收盘价"，
+不取买卖点 `bsp.klu` 那根历史极值价——避免"事后才知是顶/底、却按极值价成交"的未来函数。
 
 ### 4.3 十层纪律门控（`_can_short` / `_can_open_long`）
 
