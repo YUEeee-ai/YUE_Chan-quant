@@ -14,13 +14,27 @@ YUE_Chan is a study of how far Chan theory can be made fully algorithmic. It imp
 
 ## Preview
 
-**Chan structure** — AAPL weekly: merged K-lines, strokes/segments (black), a center (orange box), trend line (green dashed), buy/sell points (`b2` / `b2s` / `b3a`), MACD below.
+**Chan structure** — 9988.HK (Alibaba) weekly; the engine's output on real data.
 
-![Chan structure](./assets/aapl_structure.png)
+![Chan structure](./assets/chan_structure.png)
 
-**Backtest vs buy-and-hold** — AAPL 2015–2024, multi-level (month > week > day): strategy **+276%** vs buy-and-hold **+690%** (α −414pp; the gray dashed line is hold). Shown honestly — a risk-off timing system gives up return in a strong bull; its edge is the shallower drawdown.
+Color legend:
+- **Red / green candles** — weekly K-lines (up / down)
+- **Black polyline** — strokes (笔) and segments (线段)
+- **Orange dashed box** — center (中枢)
+- **Green line** — trend line (solid = up-trend, dashed = down-trend)
+- **Red ↑ `b2` / `b2s`** — buy points (2nd / pseudo-2nd type)
+- **Green ↓ `s2` / `s2s` / `s3a`** — sell points (2nd / pseudo-2nd / 3a type)
+- **Bottom red/green bars + two lines** — MACD
 
-![Equity curve and drawdown](./assets/aapl_equity.png)
+**Backtest vs buy-and-hold** — 9988.HK, 2020–2024, multi-level (month > week > day), long-only. The stock collapsed (buy-and-hold **−61.8%**); the risk-off timing system sat out most of the fall and lost only **−33.2%** → **α +28.6pp**. This is where the framework earns its keep: **drawdown control**, not chasing upside.
+
+![Backtest equity vs buy-and-hold](./assets/backtest_equity.png)
+
+Color legend:
+- **Blue line** — strategy equity
+- **Gray dashed line** — buy-and-hold benchmark
+- **Red area (lower panel)** — strategy drawdown
 
 ---
 
