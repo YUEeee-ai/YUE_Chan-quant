@@ -60,7 +60,7 @@
 - **代码约定（yfinance 后缀风格）**：美股 `AAPL`、港股 `0700.HK`、A 股 `600519.SS / 000001.SZ`；
   市场归属由 `Common.MarketCapability.detect_market` 按后缀路由（与交易/回测层共享同一识别逻辑）。
 - `INTERVAL_MAP`：`KL_TYPE → yfinance interval`（`1m/5m/15m/30m/60m/1d/1wk/1mo`）；
-  `PERIOD_MAP`：未给 `begin_date` 时的回溯期（分钟线 7~730 天、日周月 `max`）。
+  `PERIOD_MAP`：未给 `begin_date` 时的回溯期（分钟线 7–730 天、日周月 `max`）。
 - 下载用 `yf.Ticker(code).history(**kwargs)`，**`auto_adjust=False`（手动复权）**。
 - **复权处理（关键坑，注释详尽）**：
   - `AUTYPE.QFQ` 前复权：用 `ratio = Adj Close / Close` 同比例缩放 O/H/L/C，并 `.round(3)`。

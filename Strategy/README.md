@@ -132,7 +132,7 @@
 
 四个执行原语：`_open_long / _open_short`（受门控 + 缩放，见 4.3）、`_close_long_signal /
 _close_short_signal`（平多/平空）、`_execute_flip`（反手：一个信号内先平旧再开新，默认关闭）。
-若 `require_fx_confirm=True`，开仓不立即成交，而是写入 `_pending_signal`，等最近 1~3 根合并 K 线
+若 `require_fx_confirm=True`，开仓不立即成交，而是写入 `_pending_signal`，等最近 1–3 根合并 K 线
 出现对应 `FX_TYPE.BOTTOM/TOP` 分型才在 `_try_confirm_pending` 中以最新价入场（落实"不预测、等确认"）。
 
 ### 4.3 十层纪律门控（`_can_short` / `_can_open_long`）

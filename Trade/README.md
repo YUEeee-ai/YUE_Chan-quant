@@ -100,7 +100,7 @@ dry_run=True / market_cap=None`。语义映射（对齐回测器的四向）：
 - `buy/sell`：有 `limit_price` 走 `LimitOrderRequest`（`TimeInForce.DAY`），否则 `MarketOrderRequest`
   （buy 支持 `notional` 名义下单）。下单后 `_wait_for_fill` 轮询（默认 timeout=10s、interval=0.5s），
   直到 `filled/partially_filled/cancelled/rejected`。
-- **percentage 语义坑**：调用方传 0~1 小数，Alpaca `close_position` 要 1~100 百分数，故内部 `*100` 取整
+- **percentage 语义坑**：调用方传 0–1 小数，Alpaca `close_position` 要 1–100 百分数，故内部 `*100` 取整
   （`_exec_sell` 传的是 `percentage`）。
 - `_to_result` **严格校验状态**：只有 `filled/partially_filled` 才算 `success=True`，拒单/撤单归为失败——
   防止把未成交订单当成功导致策略/账户状态错配。

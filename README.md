@@ -12,13 +12,11 @@ YUE_Chan turns Chan theory from a chart-marking hobby into a backtestable, live-
 
 ## Preview
 
-AAPL · 2015–2024 · multi-level backtest (month > week > day).
+**Chan structure** — AAPL weekly: merged K-lines, strokes/segments (black), a center (orange box), trend line (green dashed), buy/sell points (`b2` / `b2s` / `b3a`), MACD below.
 
-**Chan structure & executed trades**
+![Chan structure](./assets/aapl_structure.png)
 
-![Chan structure and executed trades](./assets/aapl_structure_trades.png)
-
-**Equity curve & drawdown**
+**Backtest equity curve** — AAPL 2015–2024, multi-level (month > week > day): +292.69% total, Sharpe 0.68, 75% win rate; drawdown below.
 
 ![Equity curve and drawdown](./assets/aapl_equity.png)
 
@@ -165,7 +163,7 @@ A single `DATA_SRC` enum switches sources; **yfinance covers US / HK / A-shares 
 | ccxt | `ccxt` | Crypto | `BTC/USDT` |
 | Local / custom | `custom:file:Class` | any | any |
 
-Supported bar levels (`KL_TYPE`): year / quarter / month / week / day and 1/3/5/15/30/60-minute. Multi-level analysis needs enough history on the higher levels — with `--lv month,week,day`, start ~8–10 years back.
+Supported bar levels (`KL_TYPE`): year / quarter / month / week / day and 1/3/5/15/30/60-minute. Multi-level analysis needs enough history on the higher levels — with `--lv month,week,day`, start about 8–10 years back.
 
 ## Strategy engine
 

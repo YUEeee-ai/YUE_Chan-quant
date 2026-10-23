@@ -5,7 +5,7 @@
 `KLine` 是**形态学的存储与索引层**，把最原始的一根根行情数据封装成对象、组织成链表/列表，并挂载各类技术指标。它是 `Combiner`（合并算法）的**宿主**，也是笔、线段、中枢、买卖点所在计算流水线的**总入口**。三个核心对象层层递进：
 
 - `CKLine_Unit`（K 线单元）：一根**原始** K 线。持有 `time/open/high/low/close`、成交信息 `CTradeInfo`、以及挂载在其上的指标对象（`macd`/`boll`/`trend`/`demark`）。它还持有跨级别关系（`sub_kl_list` 次级别子 K 线、`sup_kl` 父级别 K 线）与指向所属合并 K 线的 `__klc`。
-- `CKLine`（合并 K 线）：**继承** `Combiner.CKLine_Combiner[CKLine_Unit]`，在合并包络之上加了序号 `idx`、级别 `kl_type`，并实现了分型有效性校验 `check_fx_valid`。一根 `CKLine` 内部聚合 1~N 根 `CKLine_Unit`（`self.lst`）。
+- `CKLine`（合并 K 线）：**继承** `Combiner.CKLine_Combiner[CKLine_Unit]`，在合并包络之上加了序号 `idx`、级别 `kl_type`，并实现了分型有效性校验 `check_fx_valid`。一根 `CKLine` 内部聚合 1–N 根 `CKLine_Unit`（`self.lst`）。
 - `CKLine_List`（K 线列表）：**单个级别的中枢调度器**。持有并串联该级别的全部计算结果——合并 K 线列表、笔、线段、线段之线段、笔中枢、段中枢、买卖点。`Chan.py` 对每个级别建一个 `CKLine_List`。
 
 - 辅助：`CTradeInfo` 把成交量/成交额/换手率封装进 K 线单元。

@@ -14,13 +14,11 @@
 
 ## 预览
 
-AAPL · 2015–2024 · 多级别回测（月 > 周 > 日）。
+**缠论结构** — AAPL 周线：合并 K 线、笔/线段（黑线）、中枢（橙色框）、趋势线（绿虚线）、买卖点标注（`b2` / `b2s` / `b3a`），下方 MACD。
 
-**缠论结构与成交标记**
+![缠论结构](./assets/aapl_structure.png)
 
-![缠论结构与成交标记](./assets/aapl_structure_trades.png)
-
-**资金曲线与回撤**
+**回测资金曲线** — AAPL 2015–2024，多级别（月 > 周 > 日）：总收益 +292.69%、夏普 0.68、胜率 75%，下方为回撤。
 
 ![资金曲线与回撤](./assets/aapl_equity.png)
 
@@ -147,7 +145,7 @@ python MainChan.py --mode analyze --symbol 600519.SS --autype qfq --start 2020-0
 python MainChan.py --mode analyze --symbol AAPL --plot
 ```
 
-`analyze` 会打印：操作级别结构（K线/笔/线段/中枢/买卖点）、①~⑩ 各层判定：各级别走势类型与跨级别背驰归属、同级别分解各段、中阴阶段、均线强弱、小转大（需 `--nested`）、中枢震荡、短线反弹窗口、两重表里关系、多重赋格声部、能量动力。
+`analyze` 会打印：操作级别结构（K线/笔/线段/中枢/买卖点）、①–⑩ 各层判定：各级别走势类型与跨级别背驰归属、同级别分解各段、中阴阶段、均线强弱、小转大（需 `--nested`）、中枢震荡、短线反弹窗口、两重表里关系、多重赋格声部、能量动力。
 
 ### 3. 回测（任意市场 · 任意标的 · 任意区间）
 
@@ -192,7 +190,7 @@ python MainChan.py --mode live --symbol AAPL --broker alpaca --paper --dry-run  
 
 ## 十层级别/走势纪律
 
-十层都作用在**操作级别**（默认日线，`--lv` 的最小级别）产生的三类买卖点之上，作为"要不要执行、执行多大仓位"的门控。其中①~⑨默认开启，可分别用 `--no-level-linkage / --no-decompose / --no-middle-yin / --no-ma / --no-small-turn-big / --no-zs-oscillation / --no-rebound / --no-inside-outside / --no-fugue` 关闭以做对照；⑩默认关闭，用 `--use-energy` 开启（可配 `--energy-veto-only` 变体）。前四层见下，⑤~⑩见其后各小节。
+十层都作用在**操作级别**（默认日线，`--lv` 的最小级别）产生的三类买卖点之上，作为"要不要执行、执行多大仓位"的门控。其中①–⑨默认开启，可分别用 `--no-level-linkage / --no-decompose / --no-middle-yin / --no-ma / --no-small-turn-big / --no-zs-oscillation / --no-rebound / --no-inside-outside / --no-fugue` 关闭以做对照；⑩默认关闭，用 `--use-energy` 开启（可配 `--energy-veto-only` 变体）。前四层见下，⑤–⑩见其后各小节。
 
 ### ① 多级别联立 + 跨级别背驰归属（`Trend/LevelLinkage.py`）
 
@@ -252,7 +250,7 @@ python MainChan.py --mode live --symbol AAPL --broker alpaca --paper --dry-run  
 
 **做法**：以 MACD 红绿柱累积近似能量，计算末中枢离开段/进入段能量比；离开段把价格推过进入段极值但能量比 < `--energy-decay`（默认 0.8）→ **能量背驰**（价格与动力背离，先于几何背驰的衰竭信号）。能量背驰有两个用途：否决能量衰竭方向的追势开仓（开仓门控），以及许可顺势仓先于几何卖点离场（许可性离场，可用 `--energy-veto-only` 单独关闭、把离场交还几何卖点）。
 
-**默认关闭**：11 标的消融验证（RESEARCH 第十二/十五节）显示其价值由标的波动形态决定——高波动/深熊个股上它是"救命层"（TSLA 无⑩时裸信号 -425%，开⑩翻正 +318%~+381%），稳定长牛上全开曾让茅台 -695pp（许可性离场打断复利）。`use_energy` 默认 `False`，显式 `--use-energy` 开启。
+**默认关闭**：11 标的消融验证（RESEARCH 第十二/十五节）显示其价值由标的波动形态决定——高波动/深熊个股上它是"救命层"（TSLA 无⑩时裸信号 -425%，开⑩翻正 +318%–+381%），稳定长牛上全开曾让茅台 -695pp（许可性离场打断复利）。`use_energy` 默认 `False`，显式 `--use-energy` 开启。
 
 **仅否决变体 `--energy-veto-only`**：只保留"否决追势开仓"，关闭"许可性提前离场"。此变体更贴原作——第104课全文只有纲领（"一切都是几何结构说了算"，以"具体怎么样，以后慢慢说来"结尾），背驰对买卖点的关系按第24课背驰-买卖点定理（"任一背驰都必然制造某级别的买卖点"）是**转折确认**而非提前离场；MACD 只是"对背驰的辅助判断"（第24课标题）。**扩至 11 标的后**（RESEARCH 第十五节）：仅否决 vs 全关 6 胜 4 负 1 平（Δ 中位 +7.8pp）、vs 全开 6 胜 3 负 2 平；高波动/深熊个股强烈推荐，稳定长牛指数（QQQ 仅否决 -86.6pp）反而有害。**一键决策新票**：
 
@@ -280,7 +278,7 @@ python Script/EnergyModeAdvisor.py --symbol TSLA,0700.HK,600519.SS --autype qfq
 
 **支持的 K 线级别**（`KL_TYPE`）：`K_YEAR/K_QUARTER/K_MON/K_WEEK/K_DAY/K_60M/K_30M/K_15M/K_5M/K_3M/K_1M`。yfinance 支持日/周/月与分钟级；分钟级历史长度受 yfinance 限制。
 
-> 多级别联立需要更高级别有足够历史来长出中枢：`--lv month,week,day` 建议 `--start` 给到 8~10 年前，否则周/月线中枢太稀疏、级别归属样本不足。
+> 多级别联立需要更高级别有足够历史来长出中枢：`--lv month,week,day` 建议 `--start` 给到 8–10 年前，否则周/月线中枢太稀疏、级别归属样本不足。
 
 **接入新数据源**：继承 `DataAPI/CommonStockAPI.py::CCommonStockApi`，实现 `get_kl_data()` 生成器与 `SetBasciInfo()`，注册进 `Chan.py::GetStockAPI`。参考 `DataAPI/USStockAPI.py`。
 
@@ -318,7 +316,7 @@ python Script/EnergyModeAdvisor.py --symbol TSLA,0700.HK,600519.SS --autype qfq
 
 ### 分型确认（`require_fx_confirm`，默认 True）
 
-买卖点产生后不立即入场，等待 1~3 根合并 K 线出现对应底/顶分型（做多等底分型、做空等顶分型）才入场，避免"接飞刀"；超过 10 根未确认自动作废。`--no-fx-confirm` 关闭。
+买卖点产生后不立即入场，等待 1–3 根合并 K 线出现对应底/顶分型（做多等底分型、做空等顶分型）才入场，避免"接飞刀"；超过 10 根未确认自动作废。`--no-fx-confirm` 关闭。
 
 ### 多空非对称止损
 
